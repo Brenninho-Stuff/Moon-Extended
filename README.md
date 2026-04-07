@@ -1,4 +1,4 @@
-# Friday Night Funkin' - Moon Engine
+# Friday Night Funkin' - Moon Extended
 
 ![](https://raw.githubusercontent.com/BarbaraOficial/Moon-Engine/main/art/MoonEngineLogo.png)
 
