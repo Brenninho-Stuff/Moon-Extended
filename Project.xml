@@ -1,187 +1,310 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="Friday Night Funkin': Moon Engine" file="MoonEngine" packageName="com.teammoon.moonengine" package="com.teammoon.moonengine" main="Main" version="0.2.8" company="TeamMoon" />
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+	<!--                        APPLICATION SETTINGS                           -->
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
 
-	<!--Switch Export with Unique ApplicationID and Icon-->
+	<!-- Default title used on all platforms unless overridden below -->
+	<app title="Friday Night Funkin': Moon Extended"
+	     file="MoonExtended"
+	     packageName="com.teammoon.moonextended"
+	     package="com.teammoon.moonextended"
+	     main="Main"
+	     version="0.2.8"
+	     company="TeamMoon" />
+
+	<!-- Android-specific title override -->
+	<app title="FNF: Moon Extended" if="android" />
+
+	<!-- Nintendo Switch export — unique Application ID -->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
 
-	<!-- NOTE TO SELF: DISABLE THIS IF ISSUES ARE FOUND -->
-	<haxedef name="LINC_LUA_RELATIVE_DYNAMIC_LIB"/> <!-- stable luas PUT AFTER FIRST LINE WITH APP NAME AND ETC -->
+	<!-- Stable Lua dynamic library linking — disable only if linking issues arise -->
+	<haxedef name="LINC_LUA_RELATIVE_DYNAMIC_LIB" />
 
-	<!--The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file
-		or you can set the actual size of your file manually at "FlxPreloaderBase-onUpdate-bytesTotal"-->
+	<!-- Flash preloader (accurate only when SWF is embedded in HTML) -->
 	<!-- <app preloader="Preloader" resizable="true" /> -->
 	<app preloader="flixel.system.FlxPreloader" />
 
-	<!--Minimum without FLX_NO_GAMEPAD: 11.8, without FLX_NO_NATIVE_CURSOR: 11.2-->
+	<!-- Minimum SWF version: 11.8 without FLX_NO_GAMEPAD, 11.2 without FLX_NO_NATIVE_CURSOR -->
 	<set name="SWF_VERSION" value="11.8" />
-	
-	<!-- ______________________ PSYCH ENGINE CUSTOMIZATION ______________________ -->
 
-	<define name="MODS_ALLOWED" if="desktop || mobile || emscripten" />
-	<define name="HSCRIPT_ALLOWED" if="desktop || mobile || web" />
-	<define name="LUA_ALLOWED" if="desktop || mobile" unless="hl"/>
+
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+	<!--                       ENGINE FEATURE FLAGS                            -->
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+	<!-- Mod folder support (desktop, mobile, and web via Emscripten) -->
+	<define name="MODS_ALLOWED"        if="desktop || mobile || emscripten" />
+
+	<!-- HScript runtime scripting support -->
+	<define name="HSCRIPT_ALLOWED"     if="desktop || mobile || web" />
+
+	<!-- Lua scripting support (not supported on HashLink) -->
+	<define name="LUA_ALLOWED"         if="desktop || mobile" unless="hl" />
+
+	<!-- In-game achievements system -->
 	<define name="ACHIEVEMENTS_ALLOWED" />
-	<define name="DISCORD_ALLOWED" if="desktop" unless="hl"/>
-	<define name="PSYCH_WATERMARKS"/> <!-- DELETE THIS TO REMOVE WATERMARKS/DEV NAMES ON TITLE SCREEN -->
-	<define name="VIDEOS_ALLOWED" if="desktop || mobile" unless="32bits || hl || NOVIDEO || rpi"/> <!-- i'll keep this cuz it makes vscode think i don't use videos -->
-	<define name="CUSTOM_SHADERS_ALLOWED" unless="flash"/>
 
-	<!-- ____________________________ Window Settings ___________________________ -->
+	<!-- Discord Rich Presence (desktop only, not HashLink) -->
+	<define name="DISCORD_ALLOWED"     if="desktop" unless="hl" />
 
-	<!--These window settings apply to all targets-->
-	<window width="1280" height="720" fps="" background="#000000" hardware="true" vsync="false" />
+	<!-- Remove PSYCH_WATERMARKS to strip dev credits from the title screen -->
+	<define name="PSYCH_WATERMARKS" />
 
-	<!--HTML5-specific-->
+	<!-- Video cutscene support via hxCodec/hxvlc — excluded on 32-bit, HashLink, and RPi builds -->
+	<define name="VIDEOS_ALLOWED"      if="desktop || mobile" unless="32bits || hl || NOVIDEO || rpi" />
+
+	<!-- GLSL shader support (not available on Flash) -->
+	<define name="CUSTOM_SHADERS_ALLOWED" unless="flash" />
+
+	<!-- Auto-update check on official/release builds (not on iOS) -->
+	<define name="CHECK_FOR_UPDATES"   if="officialBuild" unless="ios" />
+
+
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+	<!--                          WINDOW SETTINGS                              -->
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+	<!-- Base window config for all targets -->
+	<window width="1280" height="720" fps="60" background="#000000"
+	        hardware="true" vsync="false" />
+
+	<!-- HTML5: allow the canvas to resize with the browser window -->
 	<window if="html5" resizable="true" />
 
-	<!--Desktop-specific-->
-	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" vsync="false"/>
+	<!-- Desktop: landscape, windowed by default, user-resizable -->
+	<window if="desktop" orientation="landscape" fullscreen="false"
+	        resizable="true" vsync="false" />
 
-	<!--Mobile-specific-->
-	<window if="mobile" orientation="landscape" fullscreen="true" resizable="false" allow-shaders="true" require-shaders="true" allow-high-dpi="true" />
+	<!-- Mobile: forced fullscreen landscape with high-DPI and shader support -->
+	<window if="mobile" orientation="landscape" fullscreen="true"
+	        resizable="false" allow-shaders="true" require-shaders="true"
+	        allow-high-dpi="true" />
 
-	<!--Switch-specific-->
-	<window if="switch" orientation="landscape" fullscreen="true" width="0" height="0" resizable="true" />
+	<!-- Nintendo Switch: fullscreen, let the OS decide resolution -->
+	<window if="switch" orientation="landscape" fullscreen="true"
+	        width="0" height="0" resizable="true" />
 
-	<!-- _____________________________ Path Settings ____________________________ -->
 
-	<set name="BUILD_DIR" value="export/debug" if="debug" />
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+	<!--                         BUILD DIRECTORIES                             -->
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+	<set name="BUILD_DIR" value="export/debug"   if="debug" />
 	<set name="BUILD_DIR" value="export/release" unless="debug" />
-	<set name="BUILD_DIR" value="export/32bit" if="32bits" />
-        <set name="BUILD_DIR" value="export/rpi" if="rpi" />
+	<set name="BUILD_DIR" value="export/32bit"   if="32bits" />
+	<set name="BUILD_DIR" value="export/rpi"     if="rpi" />
 
 	<classpath name="source" />
 
-	<!-- __________________________ Game Assets & Etc. __________________________ -->
 
-	<define name="PRELOAD_ALL" unless="web" />
-	<define name="NO_PRELOAD_ALL" unless="PRELOAD_ALL"/>
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+	<!--                        ASSETS & PRELOADING                            -->
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
 
-	<!-- Assets -->
+	<!-- Preload everything on non-web targets for smoother runtime performance -->
+	<define name="PRELOAD_ALL"    unless="web" />
+	<define name="NO_PRELOAD_ALL" unless="PRELOAD_ALL" />
+
+	<!-- Core fonts (always preloaded) -->
 	<assets path="assets/fonts" />
-	<assets path="assets/shared"        exclude="*.ogg" if="web"/>
-	<assets path="assets/shared"        exclude="*.mp3" unless="web"/>
-	<assets path="assets/videos"        library="videos"        if="VIDEOS_ALLOWED"/>
-	<assets path="assets/songs"         library="songs"         exclude="*.ogg" if="web"/>
-	<assets path="assets/songs"         library="songs"         exclude="*.mp3" unless="web"/>
-	<assets path="assets/week_assets"   library="week_assets"   rename="assets" exclude="*.ogg" if="web"/>
-	<assets path="assets/week_assets"   library="week_assets"   rename="assets" exclude="*.mp3" unless="web"/>
+
+	<!-- Shared assets — exclude the format not used by the current target -->
+	<assets path="assets/shared" exclude="*.ogg" if="web" />
+	<assets path="assets/shared" exclude="*.mp3" unless="web" />
+
+	<!-- Video assets, only when video support is enabled -->
+	<assets path="assets/videos" library="videos" if="VIDEOS_ALLOWED" />
+
+	<!-- Song audio -->
+	<assets path="assets/songs" library="songs" exclude="*.ogg" if="web" />
+	<assets path="assets/songs" library="songs" exclude="*.mp3" unless="web" />
+
+	<!-- Week-specific assets (remapped to "assets" at runtime) -->
+	<assets path="assets/week_assets" library="week_assets" rename="assets" exclude="*.ogg" if="web" />
+	<assets path="assets/week_assets" library="week_assets" rename="assets" exclude="*.mp3" unless="web" />
+
+	<!-- Optional secret/easter-egg assets for the title screen -->
 	<section if="TITLE_SCREEN_EASTER_EGG">
-		<assets path="assets/secrets" rename="assets/shared" exclude="*.ogg" if="web"/>
-		<assets path="assets/secrets" rename="assets/shared" exclude="*.mp3"  unless="web"/>
+		<assets path="assets/secrets" rename="assets/shared" exclude="*.ogg" if="web" />
+		<assets path="assets/secrets" rename="assets/shared" exclude="*.mp3" unless="web" />
 	</section>
 
-	<library name="videos"        preload="true" if="VIDEOS_ALLOWED"/>
+	<!-- Always preload videos to avoid hitches during cutscenes -->
+	<library name="videos"      preload="true" if="VIDEOS_ALLOWED" />
 
+	<!-- Preload songs and week assets on native targets -->
 	<section if="PRELOAD_ALL">
-	<library name="songs"         preload="true" />
-	<library name="week_assets"   preload="true" />
+		<library name="songs"       preload="true" />
+		<library name="week_assets" preload="true" />
 	</section>
 
+	<!-- Lazy-load on web to keep initial bundle size small -->
 	<section if="NO_PRELOAD_ALL">
-	<library name="songs"         preload="false" />
-	<library name="week_assets"   preload="false" />
+		<library name="songs"       preload="false" />
+		<library name="week_assets" preload="false" />
 	</section>
 
-	<define name="CHECK_FOR_UPDATES" if="officialBuild" unless="ios"/>
-
+	<!-- Embed example mods folder as the default "mods" directory -->
 	<section if="MODS_ALLOWED">
-		<assets path='example_mods' rename='mods' embed='false'/>
+		<assets path="example_mods" rename="mods" embed="false" />
 	</section>
-	<assets path='art/readme.txt' rename='do NOT readme.txt' unless="mobile"/>
 
-	<!-- _______________________________ Libraries ______________________________ -->
+	<!-- Readme file shipped alongside the executable on desktop -->
+	<assets path="art/readme.txt" rename="do NOT readme.txt" unless="mobile" />
 
+
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+	<!--                            HAXE LIBRARIES                             -->
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+	<!-- HaxeFlixel core -->
 	<haxelib name="flixel" />
 	<haxelib name="flixel-ui" />
 	<haxelib name="flixel-addons" />
 
-	<!--Psych stuff needed-->
-	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
-	<haxelib name="SScript" if="HSCRIPT_ALLOWED"/>
-	<haxelib name="hxCodec" if="VIDEOS_ALLOWED" unless="ios"/>
-	<haxelib name="hxvlc" if="VIDEOS_ALLOWED ios"/>
-	<haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED"/>
-	<haxelib name="flxanimate" unless="html5"/>
-	<haxelib name="tjson"/>
+	<!-- Lua scripting runtime -->
+	<haxelib name="linc_luajit"         if="LUA_ALLOWED" />
 
-	<!-- Android Specific-->
+	<!-- HScript runtime -->
+	<haxelib name="SScript"             if="HSCRIPT_ALLOWED" />
+
+	<!-- Video playback: hxCodec for most targets, hxvlc for iOS -->
+	<haxelib name="hxCodec"             if="VIDEOS_ALLOWED" unless="ios" />
+	<haxelib name="hxvlc"               if="VIDEOS_ALLOWED ios" />
+
+	<!-- Discord Rich Presence -->
+	<haxelib name="hxdiscord_rpc"       if="DISCORD_ALLOWED" />
+
+	<!-- Texture atlas / spine-like animation support -->
+	<haxelib name="flxanimate"          unless="html5" />
+
+	<!-- Lenient JSON parser (tolerates trailing commas and comments) -->
+	<haxelib name="tjson" />
+
+	<!-- Android-specific native utilities (file picker, permissions, etc.) -->
 	<haxelib name="extension-androidtools" if="android" />
 
-	<!-- Disable Discord IO Thread -->
+	<!-- HXCPP debug server — enables VS Code breakpoint debugging on debug builds -->
+	<haxelib name="hxcpp-debug-server"  if="debug" />
+
+
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+	<!--                           HAXE DEFINES                                -->
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+	<!-- Disable Discord's background IO thread to reduce threading overhead -->
 	<haxedef name="DISCORD_DISABLE_IO_THREAD" if="hxdiscord_rpc" />
+
+	<!-- Precompiled headers can break some Linux toolchains — keep them off -->
 	<haxedef name="NO_PRECOMPILED_HEADERS" if="linux" />
 
-	<!-- Enables a terminal log prompt on debug builds -->
-	<haxelib name="hxcpp-debug-server" if="debug"/>
+	<!-- ── Flixel feature toggles ──────────────────────────────────────────── -->
 
-	<!-- ______________________________ Haxedefines _____________________________ -->
-
-	<!--Enable the Flixel core recording system-->
-	<!--<haxedef name="FLX_RECORD" />-->
-
-	<!--Disable the right and middle mouse buttons-->
-	<!-- <haxedef name="FLX_NO_MOUSE_ADVANCED" /> -->
-
-	<!--Disable the native cursor API on Flash-->
-	<!--<haxedef name="FLX_NO_NATIVE_CURSOR" />-->
-
-	<!--Optimise inputs, be careful you will get null errors if you don't use conditionals in your game-->
-	<!-- <haxedef name="FLX_NO_MOUSE" if="mobile" /> -->
-	<!-- <haxedef name="FLX_NO_KEYBOARD" if="mobile" /> -->
-	<!-- <haxedef name="FLX_NO_TOUCH" if="desktop" /> -->
-	<!--<haxedef name="FLX_NO_GAMEPAD" />-->
-
-	<!--Disable the Flixel core sound tray-->
-	<!--<haxedef name="FLX_NO_SOUND_TRAY" />-->
-
-	<!--Disable the Flixel sound management code-->
-	<!--<haxedef name="FLX_NO_SOUND_SYSTEM" />-->
-
-	<!--Disable the Flixel core focus lost screen-->
+	<!-- Disable the focus-lost overlay (cleaner UX, especially on mobile) -->
 	<haxedef name="FLX_NO_FOCUS_LOST_SCREEN" />
 
-	<!-- Show debug traces for hxCodec -->
-	<haxedef name="HXC_DEBUG_TRACE" if="debug hxCodec" />
-        <haxedef name="HXC_LIBVLC_LOGGING" if="debug hxCodec" />
-	
-	<!--Disable the Flixel core debugger. Automatically gets set whenever you compile in release mode!-->
+	<!-- Uncomment to enable Flixel's built-in replay recording system -->
+	<!-- <haxedef name="FLX_RECORD" /> -->
+
+	<!-- Uncomment to disable right/middle mouse buttons -->
+	<!-- <haxedef name="FLX_NO_MOUSE_ADVANCED" /> -->
+
+	<!-- Platform-specific input optimisations (uncomment if needed) -->
+	<!-- <haxedef name="FLX_NO_MOUSE"    if="mobile" /> -->
+	<!-- <haxedef name="FLX_NO_KEYBOARD" if="mobile" /> -->
+	<!-- <haxedef name="FLX_NO_TOUCH"    if="desktop" /> -->
+	<!-- <haxedef name="FLX_NO_GAMEPAD" /> -->
+
+	<!-- Uncomment to strip the Flixel sound tray entirely -->
+	<!-- <haxedef name="FLX_NO_SOUND_TRAY" /> -->
+
+	<!-- Disable Flixel's built-in debugger on release builds (auto-set, explicit for clarity) -->
 	<haxedef name="FLX_NO_DEBUG" unless="debug" />
 
-	<!--Enable this for Nape release builds for a serious peformance improvement-->
+	<!-- ── hxCodec / VLC debug output ──────────────────────────────────────── -->
+	<haxedef name="HXC_DEBUG_TRACE"    if="debug hxCodec" />
+	<haxedef name="HXC_LIBVLC_LOGGING" if="debug hxCodec" />
+
+	<!-- ── HXCPP runtime safety & stack traces ─────────────────────────────── -->
+
+	<!-- Null pointer check — catches NPEs early; disable in final release for speed -->
+	<haxedef name="HXCPP_CHECK_POINTER" />
+
+	<!-- Include line numbers and full stack traces in crash reports -->
+	<haxedef name="HXCPP_STACK_LINE"  />
+	<haxedef name="HXCPP_STACK_TRACE" />
+
+	<!-- ── HXCPP performance optimisations ─────────────────────────────────── -->
+
+	<!-- Generational GC: reduces GC pause times significantly on large heaps -->
+	<haxedef name="HXCPP_GC_GENERATIONAL" unless="debug" />
+
+	<!-- Aggressive compiler optimisations for release builds -->
+	<haxedef name="HXCPP_OPTIMIZE_FOR_SPEED" unless="debug" />
+
+	<!-- Nape physics release optimisations (no effect if Nape isn't used) -->
 	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
 
-	<haxedef name='no-deprecation-warnings' />
+	<!-- ── Miscellaneous ───────────────────────────────────────────────────── -->
 
-	<haxedef name='no-inline' if="html5"/>
+	<!-- Suppress deprecation warnings from third-party libraries -->
+	<haxedef name="no-deprecation-warnings" />
 
-	<!--Always enable Null Object Reference check-->
-	<haxedef name="HXCPP_CHECK_POINTER" />
-	<haxedef name="HXCPP_STACK_LINE" />
-	<haxedef name="HXCPP_STACK_TRACE" />
-	
-	<section if="android">
-	<!-- Do whatever you want I'm tired uninstall and install everytime -->
-	<certificate path="key.keystore" password="nullfunni" alias="null" alias-password="nullfunni" unless="debug" />
+	<!-- Disable inlining on HTML5 to keep JavaScript output debuggable -->
+	<haxedef name="no-inline" if="html5" />
 
-	<!--Target SDK-->
-	<android target-sdk-version="28" if="EXTERNAL || MEDIA"/> <!-- blame android 11+!!! -->
-	</section>
-
-	<!--Macro fixes-->
+	<!-- Macro compatibility shims -->
 	<haxeflag name="--macro" value="allowPackage('flash')" />
 	<haxeflag name="--macro" value="include('my.pack')" />
 
-	<!-- _________________________________ Custom _______________________________ -->
 
-	<!--Place custom nodes like icons here (higher priority to override the HaxeFlixel icon)-->
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+	<!--                         ANDROID SETTINGS                              -->
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
 
-	<assets path='art/icon16.png' rename='icon.png' if="linux" />
-	<icon path="art/icon16.png" size='16'/>
-	<icon path="art/icon32.png" size='32'/>
-	<icon path="art/icon64.png" size='64'/>
+	<section if="android">
+
+		<!-- Release signing — keystore credentials -->
+		<!-- ⚠ WARNING: Do NOT commit real credentials to a public repository.  -->
+		<!--   Consider using environment variables or a secrets manager instead. -->
+		<certificate path="key.keystore"
+		             password="nullfunni"
+		             alias="null"
+		             alias-password="nullfunni"
+		             unless="debug" />
+
+		<!-- SDK version targeting -->
+		<!-- Minimum SDK 21 = Android 5.0 Lollipop (wide device coverage)       -->
+		<android minimum-sdk-version="21" />
+
+		<!-- Target SDK 33 = Android 13 (required for Play Store compliance)      -->
+		<!-- Use 28 only when EXTERNAL/MEDIA storage APIs need legacy behaviour   -->
+		<android target-sdk-version="33" unless="EXTERNAL || MEDIA" />
+		<android target-sdk-version="28" if="EXTERNAL || MEDIA" />  <!-- Android 11+ storage workaround -->
+
+		<!-- Gradle build tools version — keep in sync with your local SDK install -->
+		<android build-tools-version="34.0.0" />
+
+		<!-- Enable large heap to reduce OOM crashes on asset-heavy songs -->
+		<config:android large-heap="true" />
+
+	</section>
+
+
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+	<!--                      ICONS & CUSTOM ASSETS                            -->
+	<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+	<!-- Linux taskbar icon -->
+	<assets path="art/icon16.png" rename="icon.png" if="linux" />
+
+	<!-- Multi-resolution icons for all platforms -->
+	<icon path="art/icon16.png" size="16" />
+	<icon path="art/icon32.png" size="32" />
+	<icon path="art/icon64.png" size="64" />
 	<icon path="art/iconOG.png" />
+
 </project>
